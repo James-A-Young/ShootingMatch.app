@@ -1,16 +1,15 @@
-import { MongoClient, Db } from 'mongodb';
+import mongoose, { Connection } from 'mongoose';
 
-const uri = process.env.MONGODB_URI || 'mongodb://root:example@localhost:27017';
-const dbName = process.env.MONGODB_DB || 'shootingmatch';
+const uri = process.env.MONGODB_URI || 'mongodb://root:example@localhost:27017/shootingmatch';
 
-let client: MongoClient;
-let db: Db;
+let connection: Connection | null = null;
 
 export async function connectToDatabase() {
-  if (!client || !db) {
-    client = new MongoClient(uri);
-    await client.connect();
-    db = client.db(dbName);
+  if (!connection) {
+    await mongoose.connect(uri, {
+      // Add options here if needed, e.g. useNewUrlParser, useUnifiedTopology
+    });
+    connection = mongoose.connection;
   }
-  return { client, db };
+  return mongoose;
 }
