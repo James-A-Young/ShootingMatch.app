@@ -7,7 +7,7 @@ const schemes: ProtectionScheme[] = [
     new BasicProtection()
 ]
 // hold current scheme with highest shceme id;
-const bestScheme = schemes.sort((a, b) => b.scheme - a.scheme)[0];
+let bestScheme = schemes.sort((a, b) => b.scheme - a.scheme)[0];
 
 export class PasswordUtils {
   static async protect(password: string): Promise<ProtectedPassword> {
@@ -26,8 +26,8 @@ static async validate(candidatePassword: string, protectedPassword: ProtectedPas
   const toValidate = protectedPassword ?? dummypwd;
   const nullPassed = !protectedPassword;
 
-  const scheme = schemes.find(s => s.scheme === toValidate.scheme);
-  if (!scheme) throw new Error(`Unsupported protection scheme: ${toValidate.scheme}`);
+  const scheme: ProtectionScheme | undefined = schemes.find(s => s.scheme == toValidate.scheme);
+  if (!scheme) throw new Error(`Unsupported protection scheme: ${toValidate.scheme}. schemes: ${JSON.stringify(schemes)}`);
 
   const valid = await scheme.verify(candidatePassword, toValidate);
 
@@ -37,4 +37,11 @@ static async validate(candidatePassword: string, protectedPassword: ProtectedPas
   return { valid: valid && !nullPassed, newProtectedPassword:  needsUpgrade ? undefined : newProtectedPassword};
   }
 
+static addSchemes(scheme: ProtectionScheme): void {
+   console.log('Adding schemes', scheme);
+    schemes.push(scheme);
+    bestScheme = schemes.sort((a, b) => b.scheme - a.scheme)[0];
+  }
 }
+
+
