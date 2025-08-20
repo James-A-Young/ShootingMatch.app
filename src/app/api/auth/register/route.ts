@@ -11,25 +11,15 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Email and password required' }, { status: 400 });
   }
 
-await connectToDatabase()
   const userRepo = new UserRepository();
-
+  const protectedPassword = await PasswordUtils.protect(password);
+  
   const existing = await userRepo.findByEmail(email);
   if (existing) {
     return NextResponse.json({ error: 'User already exists' }, { status: 409 });
   }
 
-  await userRepo.createUser({
-    email
-  });
-
-  const protectedPassword = await PasswordUtils.protect(password);
-
-  await userRepo.setPassword(email, {
-    hash: protectedPassword.hash,
-    salt: protectedPassword.salt,
-    scheme: protectedPassword.scheme
-  });
+  await userRepo.createUser({ email}, protectedPassword);
 
   return NextResponse.json({ success: true });
 }

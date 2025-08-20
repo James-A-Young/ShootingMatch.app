@@ -1,8 +1,8 @@
-import { promise, string } from 'zod';
 import { UserModel, IUser } from './user.model';
 import {IUserPassword, UserPasswordModel} from './userPassword.model'
 import { ProtectedPassword } from '@/lib/passwords/types/protectedPassword';
 import { connectToDatabase } from './mongo';
+import mongoose from 'mongoose';
 
 export class UserRepository {
     
@@ -11,9 +11,17 @@ export class UserRepository {
     return UserModel.findOne({ email });
   }
 
-  async createUser(data: Partial<IUser>): Promise<IUser> {
+  async createUser(data: Partial<IUser>,  cred?: Partial<IUserPassword>): Promise<IUser> {
     await connectToDatabase();
-    return UserModel.create(data);
+    const session = await mongoose.startSession();
+    session.startTransaction()
+    const user = await UserModel.create(data);
+    if(cred){
+      await UserPasswordModel.create({ ...cred, userId: user._id });
+    }
+    await session.commitTransaction();
+    session.endSession();
+    return user;
   }
 
   async updateUser(id: string, data: Partial<IUser>): Promise<IUser | null> {
@@ -39,10 +47,15 @@ export class UserRepository {
 
     //get current password
     const currentPassword = await UserPasswordModel.findOne({ userId: user._id });
-    if (!currentPassword) return false; 
+    if(currentPassword){
+      currentPassword.set(data);
+      await currentPassword.save();
 
+    }
+    else{
     const userPassword = new UserPasswordModel({ ...data, userId: user._id });
     await userPassword.save();
+    }
     return true;
   }
 
