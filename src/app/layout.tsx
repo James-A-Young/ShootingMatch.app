@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
-import { Header } from '@/components/layout/header';
+import { HeaderWithSession } from '@/components/layout/HeaderWithSession';
 import { Footer } from '@/components/layout/footer';
 
 export const metadata: Metadata = {
@@ -29,12 +29,12 @@ export default function RootLayout({
         />
       </head>
       <body className="font-body antialiased">
-        <div className="relative flex min-h-screen flex-col">
-          <Header />
-          <main className="flex-1">{children}</main>
-          <Footer />
-        </div>
-        <Toaster />
+          <div className="relative flex min-h-screen flex-col">
+            <HeaderWithSession />
+            <main className="flex-1">{children}</main>
+            <Footer />
+          </div>
+          <Toaster />
       </body>
     </html>
   );

@@ -1,19 +1,40 @@
+
+"use client";
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { PlusCircle, Users, Settings } from 'lucide-react'
 import Link from 'next/link'
+import { useSession, SessionProvider } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+
 
 const userClubs = [
   { id: '1', name: 'Oakridge Shooters', role: 'Manager' },
   { id: '2', name: 'Pine Valley Marksmen', role: 'Member' },
   { id: '3', name: 'Riverbend Practical Shooters', role: 'Member' },
-]
+];
 
-export default function DashboardPage() {
+
+
+export default function DashboardPageWrapper() {
+  return (
+    <SessionProvider>
+      <DashboardPage />
+    </SessionProvider>
+  );
+}
+
+function DashboardPage() {
+  const { data: session, status } = useSession();
+  if (status === "loading") {
+    return <div className="flex justify-center items-center h-screen">Loading...</div>;
+  }
+
   return (
     <div className="container mx-auto p-4 md:p-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold font-headline">Welcome back, User!</h1>
+        <h1 className="text-3xl font-bold font-headline">Welcome back, {session?.user?.name}!</h1>
         <p className="text-muted-foreground">Here's an overview of your clubs and activities.</p>
       </div>
 
@@ -72,5 +93,5 @@ export default function DashboardPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

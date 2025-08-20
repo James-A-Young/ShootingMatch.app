@@ -5,6 +5,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Menu, Target } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from 'next/navigation';
+import { useSession, signIn, signOut } from "next-auth/react";
 
 const navLinks = [
     { href: "#features", label: "Features" },
@@ -12,8 +13,10 @@ const navLinks = [
     { href: "/dashboard", label: "Dashboard" },
 ];
 
+
 export function Header() {
     const pathname = usePathname();
+    const { data: session, status } = useSession();
 
     return (
         <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -80,12 +83,19 @@ export function Header() {
                     </div>
 
                     <nav className="flex items-center">
-                        <Button asChild variant="ghost" className="mr-2">
-                           <Link href="/login">Login</Link>
-                        </Button>
-                        <Button asChild className="bg-accent hover:bg-accent/90 text-accent-foreground">
-                            <Link href="/register">Sign Up</Link>
-                        </Button>
+                        {session && session.user ? (
+                            <>
+                                <span className="mr-4">{session.user.email}</span>
+                                <Button variant="ghost" className="mr-2" onClick={() => signOut()}>Logout</Button>
+                            </>
+                        ) : (
+                            <>
+                                <Button variant="ghost" className="mr-2" onClick={() => signIn()}>Login</Button>
+                                <Button asChild className="bg-accent hover:bg-accent/90 text-accent-foreground">
+                                    <Link href="/register">Sign Up</Link>
+                                </Button>
+                            </>
+                        )}
                     </nav>
                 </div>
             </div>
