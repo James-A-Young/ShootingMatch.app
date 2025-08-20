@@ -32,13 +32,13 @@ static async validate(candidatePassword: string, protectedPassword: ProtectedPas
   const valid = await scheme.verify(candidatePassword, toValidate);
 
   const newProtectedPassword = await this.protect(candidatePassword);
-  const needsUpgrade = toValidate.scheme === bestScheme.scheme;
+  const needsUpgrade = toValidate.scheme !== bestScheme.scheme;
 
-  return { valid: valid && !nullPassed, newProtectedPassword:  needsUpgrade ? undefined : newProtectedPassword};
+  return { valid: valid && !nullPassed, newProtectedPassword:  needsUpgrade ? newProtectedPassword : undefined};
   }
 
 static addSchemes(scheme: ProtectionScheme): void {
-   console.log('Adding schemes', scheme);
+    console.log('Adding schemes', scheme);
     schemes.push(scheme);
     bestScheme = schemes.sort((a, b) => b.scheme - a.scheme)[0];
   }
