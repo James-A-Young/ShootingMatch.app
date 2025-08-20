@@ -41,7 +41,7 @@ export default function RegisterPage() {
         });
         setLoading(false);
         if (res.ok) {
-            router.push("/login");
+            router.push("/dashboard");
         } else {
             const data = await res.json();
             setError(data.error || "Registration failed");
@@ -106,7 +106,7 @@ export default function RegisterPage() {
                 <CardFooter className="flex flex-col gap-4">
                     <div className="text-center text-sm text-muted-foreground">
                         Already have an account?{' '}
-                        <Link href="/login" className="underline hover:text-primary">
+                        <Link href="/dashboard" className="underline hover:text-primary">
                             Login
                         </Link>
                     </div>
